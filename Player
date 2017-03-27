@@ -1,0 +1,94 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Player {
+	private double cash;
+	private double currentBet;
+	private String state;
+	private ArrayList<Card> hand;
+	private double totalWinnings;
+	private int score = 0;
+	
+	public Player(){
+		cash = 0.00;
+		this.currentBet = 0;
+		state = "";
+		hand = new ArrayList<Card>();
+		totalWinnings = 0;
+	}
+	
+	public Player(double cash){
+		this.cash = cash;
+		this.currentBet = 0;
+		state = "";
+		hand = new ArrayList<Card>();
+		totalWinnings = 0;
+	}
+	
+	
+	public double bet(){
+		return currentBet;
+	}
+	
+	
+	public void bet(double amount){
+		currentBet += amount;
+		cash -= amount;
+	}
+	
+	public void hit(Card card){
+		hand.add(card);
+	}
+	
+	public void doubleDown(Card card){
+		cash -= currentBet;
+		hand.add(card);
+		currentBet = currentBet * 2;
+		
+	}
+	
+	
+	public void stand(){
+		state = "standing";
+	}
+	
+	public boolean isStanding(){
+		return state.equals("standing");	
+	}
+	
+	public void win(double amount){
+		state = "";
+		cash += amount;
+		score = 0;
+		hand = null;
+		
+	}
+	
+	public void lose(double amount){
+		state = "";
+		cash -= amount;
+		score = 0;
+		hand = null;
+	}
+	
+	public int score(){
+		int score = 0;
+		if (hand == null){
+			return 0;
+		}else{
+			for (int i=0;i<hand.size();i++){
+				score += hand.get(i).getNumber();
+			}
+			
+			return score;
+		}
+		
+	}
+	
+	public double cash(){
+		return cash;
+	}
+	
+	
+
+}
