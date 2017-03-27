@@ -1,0 +1,116 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Game {
+	/**
+	 * 
+	 * Game class
+	 * 
+	 */
+	private Player[] players;
+	private int houseScore;
+	private ArrayList<Card> houseHand = new ArrayList<Card>();
+	private Deck gameDeck = new Deck(0L);
+	private Scanner userInput = new Scanner(System.in);
+	
+	
+	/**
+	 * 
+	 * 
+	 * @param playerNumber
+	 */
+	
+	public Game(int playerNumber){// makes game with playerNumber
+		players = new Player[playerNumber];
+		for (int i = 0; i<playerNumber;i++){
+			players[i] = new Player(100.0);
+		}
+		
+		houseScore = 0;
+		
+	}
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public boolean playersStanding(){ // checks if all players are standing
+		for (int i =0; i<players.length; i++){
+			if (!players[i].isStanding()){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public void startGame(Scanner input){ // starts the game
+		
+		for (int i =0; i<players.length;i++){
+			System.out.format("Player %s bets how much?", i+1); //iterates through all players in the players array
+			players[i].bet(input.nextInt()); // asks for bet
+			players[i].hit(gameDeck.draw()); // draws 2 cards for each player
+			players[i].hit(gameDeck.draw());
+		}
+		houseHand.add(gameDeck.draw()); // draws 2 cards for house
+		houseHand.add(gameDeck.draw());
+		calcHouseScore(); // updates the current houses score, this can be used better
+		
+		
+		
+	}
+	public void play(){ // this is where the logic of the game happens
+	
+		while(!playersStanding()){ // while all players are not standing we will continue to follow these instructions
+			for (int i=0;i<players.length;i++){ // iterates through all players in the game
+				if (players[i].isStanding() || players[i].score() > 21){ // if player is standing or the score is over 21 then will continue to print out info of that player 
+					System.out.format("Player %s standing. Current score: %s", i+1, players[i].score());
+					
+				}else{ //else, this means that the player is still in the game
+					System.out.format("Player %s turn. Current score: %s", i+1, players[i].score()); //prints out current players score
+					System.out.println();
+					System.out.println("What action shall you take (hit, double, stand)?"); // asks the user what the next action will be, like hit,double or stand
+					String action = userInput.nextLine();
+					if(action.equals("hit")){ //checks user input against hit, double, stand
+						Card currentDraw = gameDeck.draw(); // draws card for player
+						players[i].hit(currentDraw); //add card to players hand
+						System.out.format("Drew a %s of %s. New score: %s",currentDraw.getNumber(),currentDraw.getSuit(), players[i].score()); // prints what the player drew
+						System.out.println();
+						if (players[i].score() >= 21){ // if player busts then gg for them
+							players[i].stand(); //stands player
+						}
+					}else if (action.equals("double")){	
+						//double
+					}else if (action.equals("stand")){
+						//stand player
+					}
+				}
+			}
+		}
+		System.out.format("House's turn. Current score: %s", houseScore); // once all players are standing, its the houses turn
+		while (houseScore <= 17){ //house continues
+			houseHand.add(gameDeck.draw()); //draw for house
+			calcHouseScore(); //update score
+		}
+		System.out.println("House stands.");
+	}
+	
+	public void calcHouseScore(){
+		int score = 0;
+		
+		for (int i=0;i<houseHand.size();i++){
+			score += houseHand.get(i).getNumber();
+		}
+		
+		houseScore = score;
+	}
+	
+	public static void main(String[] argv){
+	Scanner input = new Scanner(System.in);
+	System.out.println("How many players?");
+	Game nGame = new Game(input.nextInt());
+	nGame.startGame(input);
+	nGame.play();
+		
+	}
+}
